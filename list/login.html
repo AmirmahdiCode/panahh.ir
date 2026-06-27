@@ -227,11 +227,6 @@
 
         .btn-submit i {
             font-size: 13px;
-            transition: transform 0.3s;
-        }
-
-        .btn-submit:hover i {
-            transform: translateX(-4px);
         }
 
         .message-box {
@@ -357,7 +352,7 @@
                 </button>
             </div>
 
-            <a href="../index.html" class="back-link">
+            <a href="index.html" class="back-link">
                 <i class="fa-solid fa-chevron-right"></i>
                 بازگشت به صفحه اصلی
             </a>
@@ -369,15 +364,15 @@
     </div>
 
     <script>
-        const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnSbDlZimAyPbnnPh59q-0lFKGjM7ZsME8Hc4PHvgrPejFOus3FsDRJXdNEScmqqIgSULvqnzZsRHt57vIz4tMKfJotVrr3grXZRGexemDfvmdNtXW3sjnnaMOvqu8hKThFDOdgsylqd6JFNUtg5i9Ztedo91FLnUFDRLaUD1aCXiNuhx-a2hFAggnME6DYqZnnlyD9rqtMzI9je4V77KGPr7aBSfENg3FyirH-46ENKU5JikVVjxmPGZRmZ98GRZkCGi1hXM_AHq0w8aCLBIx25knlyrQ&lib=MQnzc2VC0bUwTLfXTRggiKD4g43jyBv7u';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzV9pkE9RXWfpEDKiv4tkXugUqrWJJPfCnX-b2ll8s1fPM9FMaQqHKB9dHUxy87ofJWgA/exec';
 
         checkExistingLogin();
 
         function checkExistingLogin() {
-            const userData = localStorage.getItem('panah_user');
+            var userData = localStorage.getItem('panah_user');
             if (userData) {
-                const user = JSON.parse(userData);
-                verifyToken(user.token).then(valid => {
+                var user = JSON.parse(userData);
+                verifyToken(user.token).then(function(valid) {
                     if (valid) {
                         window.location.href = 'vitrine.html';
                     } else {
@@ -389,14 +384,9 @@
 
         async function verifyToken(token) {
             try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'getUserInfo',
-                        token: token
-                    })
-                });
-                const data = await res.json();
+                var url = API_URL + '?action=getUserInfo&data=' + encodeURIComponent(JSON.stringify({token: token}));
+                var res = await fetch(url);
+                var data = await res.json();
                 return !data.error;
             } catch(e) {
                 return false;
@@ -404,11 +394,11 @@
         }
 
         function switchTab(tab) {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const panels = document.querySelectorAll('.form-panel');
+            var tabs = document.querySelectorAll('.tab-btn');
+            var panels = document.querySelectorAll('.form-panel');
             
-            tabs.forEach(t => t.classList.remove('active'));
-            panels.forEach(p => p.classList.remove('active'));
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            panels.forEach(function(p) { p.classList.remove('active'); });
             
             if (tab === 'login') {
                 tabs[0].classList.add('active');
@@ -422,8 +412,8 @@
         }
 
         async function handleLogin() {
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
+            var username = document.getElementById('loginUsername').value.trim();
+            var password = document.getElementById('loginPassword').value;
 
             if (!username || !password) {
                 showMessage('لطفاً نام کاربری و رمز عبور را وارد کنید.', 'error');
@@ -431,26 +421,23 @@
             }
 
             showMessage('در حال اتصال...', 'success');
-            const btn = document.querySelector('#loginPanel .btn-submit');
+            var btn = document.querySelector('#loginPanel .btn-submit');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ورود...';
 
             try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'login',
-                        username: username,
-                        password: password
-                    })
-                });
-
-                const data = await res.json();
+                var url = API_URL + '?action=login&data=' + encodeURIComponent(JSON.stringify({
+                    username: username,
+                    password: password
+                }));
+                
+                var res = await fetch(url);
+                var data = await res.json();
 
                 if (data.success) {
                     saveToLocal(data.user, data.token);
                     showMessage('ورود موفقیت‌آمیز. در حال انتقال...', 'success');
-                    setTimeout(() => {
+                    setTimeout(function() {
                         window.location.href = 'vitrine.html';
                     }, 800);
                 } else {
@@ -466,10 +453,10 @@
         }
 
         async function handleRegister() {
-            const username = document.getElementById('regUsername').value.trim();
-            const displayName = document.getElementById('regDisplayName').value.trim();
-            const password = document.getElementById('regPassword').value;
-            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            var username = document.getElementById('regUsername').value.trim();
+            var displayName = document.getElementById('regDisplayName').value.trim();
+            var password = document.getElementById('regPassword').value;
+            var passwordConfirm = document.getElementById('regPasswordConfirm').value;
 
             if (!username || !displayName || !password) {
                 showMessage('لطفاً تمام فیلدها را پر کنید.', 'error');
@@ -492,23 +479,20 @@
             }
 
             showMessage('در حال ثبت‌نام...', 'success');
-            const btn = document.querySelector('#registerPanel .btn-submit');
+            var btn = document.querySelector('#registerPanel .btn-submit');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ثبت‌نام...';
 
             try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'register',
-                        username: username,
-                        displayName: displayName,
-                        password: password,
-                        avatar: 'fa-user'
-                    })
-                });
-
-                const data = await res.json();
+                var url = API_URL + '?action=register&data=' + encodeURIComponent(JSON.stringify({
+                    username: username,
+                    displayName: displayName,
+                    password: password,
+                    avatar: 'fa-user'
+                }));
+                
+                var res = await fetch(url);
+                var data = await res.json();
 
                 if (data.success) {
                     showMessage('ثبت‌نام با موفقیت انجام شد. اکنون وارد شوید.', 'success');
@@ -519,7 +503,7 @@
                     document.getElementById('regPassword').value = '';
                     document.getElementById('regPasswordConfirm').value = '';
                     
-                    setTimeout(() => {
+                    setTimeout(function() {
                         switchTab('login');
                         hideMessage();
                     }, 1500);
@@ -537,7 +521,7 @@
         function saveToLocal(user, token) {
             clearLocalUser();
             
-            const userData = {
+            var userData = {
                 id: user.id,
                 username: user.username,
                 displayName: user.displayName,
@@ -556,19 +540,19 @@
         }
 
         function showMessage(text, type) {
-            const box = document.getElementById('messageBox');
+            var box = document.getElementById('messageBox');
             box.textContent = text;
             box.className = 'message-box ' + type;
             box.style.display = 'block';
         }
 
         function hideMessage() {
-            const box = document.getElementById('messageBox');
+            var box = document.getElementById('messageBox');
             box.style.display = 'none';
             box.className = 'message-box';
         }
 
-        document.querySelectorAll('input').forEach(input => {
+        document.querySelectorAll('input').forEach(function(input) {
             input.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     if (document.getElementById('loginPanel').classList.contains('active')) {

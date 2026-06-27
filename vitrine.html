@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گروه پناه | ویترین</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --cream: #fdfbf7;
+            --milk: #f5efe6;
+            --beige: #ede4d8;
+            --gold: #c8af93;
+            --brown: #8b6f4e;
+            --dark: #3e2c1c;
+            --text: #5c4a3a;
+            --white: #ffffff;
+            --red: #e74c3c;
+            --green: #27ae60;
+            --blue: #2980b9;
+            --orange: #e67e22;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(160deg, var(--cream) 0%, #e8ddd0 50%, var(--beige) 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(145deg, var(--milk), var(--beige));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--brown);
+            border: 2px solid var(--gold);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .header-subtitle {
+            font-size: 11px;
+            color: #a08b73;
+        }
+
+        .header-btns {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-profile {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            color: var(--brown);
+            border: 1.5px solid var(--gold);
+        }
+
+        .btn-profile:hover {
+            background: var(--milk);
+        }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            color: var(--red);
+            border: 1.5px solid var(--red);
+            background: none;
+            font-family: inherit;
+        }
+
+        .btn-logout:hover {
+            background: #fdf0ee;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .products-grid .card-row-1 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .products-grid .card-row-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .vitrine-card {
+            background: var(--white);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            border: 1.5px solid transparent;
+        }
+
+        .vitrine-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+        }
+
+        .card-large .card-image {
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 52px;
+        }
+
+        .card-large .card-info {
+            padding: 18px 20px;
+        }
+
+        .card-large .card-title {
+            font-size: 18px;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .card-info {
+            padding: 14px 16px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .card-badge {
+            font-size: 10px;
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+        }
+
+        .card-price {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .card-price span {
+            font-size: 10px;
+            font-weight: 400;
+            margin-right: 2px;
+        }
+
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f5efe6;
+        }
+
+        .card-blue { border-color: var(--blue); }
+        .card-blue .card-image { background: linear-gradient(135deg, #eaf2f8, #d4e6f1); color: var(--blue); }
+        .card-blue .card-badge { background: var(--blue); }
+        .card-blue .card-price { color: var(--blue); }
+        .card-blue:hover { border-color: #1a5276; box-shadow: 0 8px 24px rgba(41,128,185,0.15); }
+
+        .card-orange { border-color: var(--orange); }
+        .card-orange .card-image { background: linear-gradient(135deg, #fef5e7, #fdebd0); color: var(--orange); }
+        .card-orange .card-badge { background: var(--orange); }
+        .card-orange .card-price { color: var(--orange); }
+        .card-orange:hover { border-color: #b9770e; box-shadow: 0 8px 24px rgba(230,126,34,0.15); }
+
+        .card-green { border-color: var(--green); }
+        .card-green .card-image { background: linear-gradient(135deg, #eafaf1, #d5f5e3); color: var(--green); }
+        .card-green .card-badge { background: var(--green); }
+        .card-green .card-price { color: var(--green); }
+        .card-green:hover { border-color: #1e8449; box-shadow: 0 8px 24px rgba(39,174,96,0.15); }
+
+        .card-red { border-color: var(--red); }
+        .card-red .card-image { background: linear-gradient(135deg, #fdf0ee, #fadbd8); color: var(--red); }
+        .card-red .card-badge { background: var(--red); }
+        .card-red .card-price { color: var(--red); }
+        .card-red:hover { border-color: #922b21; box-shadow: 0 8px 24px rgba(231,76,60,0.15); }
+
+        .card-gold { border-color: var(--gold); }
+        .card-gold .card-image { background: linear-gradient(135deg, #fdfaf5, #f8f0e3); color: var(--brown); }
+        .card-gold .card-badge { background: var(--gold); color: var(--dark); }
+        .card-gold .card-price { color: var(--brown); }
+        .card-gold:hover { border-color: var(--brown); }
+
+        .footer {
+            text-align: center;
+            padding: 24px 20px;
+            background: var(--white);
+            margin-top: 20px;
+            border-top: 1px solid #f0e8dc;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--brown);
+            font-size: 12px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .footer-links a:hover {
+            color: var(--dark);
+        }
+
+        .footer-text {
+            font-size: 11px;
+            color: #b8a48e;
+        }
+
+        .floating-support {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(145deg, var(--blue), #1a5276);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(41,128,185,0.35);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .floating-support:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 28px rgba(41,128,185,0.5);
+        }
+
+        .floating-support i {
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        @media (max-width: 992px) {
+            .products-grid .card-row-4 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .products-grid .card-row-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header-title { font-size: 18px; }
+            .header-icon { width: 36px; height: 36px; font-size: 18px; }
+            .btn-profile { font-size: 11px; padding: 6px 10px; }
+            .card-large .card-image { height: 110px; font-size: 40px; }
+            .card-large .card-title { font-size: 15px; }
+            .card-image { height: 130px; font-size: 34px; }
+            .card-info { padding: 10px 12px; }
+            .card-title { font-size: 12px; }
+        }
+
+        @media (max-width: 400px) {
+            .products-grid .card-row-4 {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .card-image { height: 110px; font-size: 28px; }
+            .card-title { font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-logo">
+                <div class="header-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <div class="header-title">گروه پناه</div>
+                    <div class="header-subtitle">فضای امن گفتگو</div>
+                </div>
+            </div>
+            <div class="header-btns">
+                <a href="profile.html" class="btn-profile" id="profileBtn">
+                    <i class="fa-solid fa-user"></i> <span id="profileBtnText">حساب کاربری</span>
+                </a>
+                <button class="btn-logout" id="logoutBtn" style="display:none;" onclick="handleLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> خروج
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="products-grid">
+
+            <div class="card-row-1">
+                <div class="vitrine-card card-blue card-large" onclick="window.location.href='chat.html'">
+                    <div class="card-image">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">ورود به چت گروه</div>
+                        <div class="card-meta">
+                            <span class="card-badge">گفتگوی زنده</span>
+                            <span class="card-price">ورود <span>به چت</span></span>
+                        </div>
+                        <div class="card-footer-row">
+                            <span style="font-size:11px;color:#a08b73;">
+                                <i class="fa-solid fa-users"></i> گفتگوی گروهی
+                            </span>
+                            <span style="font-size:11px;color:var(--blue);">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-row-4">
+                <div class="vitrine-card card-gold" onclick="window.open('https://eitaa.com/Amirmahdi_code','_blank')">
+                    <img src="https://cdn.imgurl.ir/uploads/m87412_4b5310ee-fa5a-4d2e-a58c-a9337ddb4f92.png" 
+                         class="card-image" 
+                         alt="حمایت از سازنده"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                         style="object-fit:cover;">
+                    <div class="card-image" style="display:none;">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">حمایت از سازنده</div>
+                        <div class="card-meta">
+                            <span class="card-badge">رسمی</span>
+                            <span class="card-price">کلیک کنید <span>حمایت</span></span>
+                        </div>
+                        <div class="card-footer-row">
+                            <span style="font-size:10px;color:#a08b73;">
+                                <i class="fa-solid fa-star"></i> از سازنده حمایت کنید
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vitrine-card card-orange" onclick="window.location.href='rules.html'">
+                    <div class="card-image">
+                        <i class="fa-solid fa-gavel"></i>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">مشاهده قوانین و محدودیت‌ها</div>
+                        <div class="card-meta">
+                            <span class="card-badge">قوانین</span>
+                            <span class="card-price">مشاهده <span>قوانین</span></span>
+                        </div>
+                        <div class="card-footer-row">
+                            <span style="font-size:10px;color:#a08b73;">
+                                <i class="fa-solid fa-shield-halved"></i> قوانین گروه
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vitrine-card card-green" onclick="window.location.href='about.html'">
+                    <div class="card-image">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">درباره ما</div>
+                        <div class="card-meta">
+                            <span class="card-badge">اطلاعات</span>
+                            <span class="card-price">بیشتر <span>بدانید</span></span>
+                        </div>
+                        <div class="card-footer-row">
+                            <span style="font-size:10px;color:#a08b73;">
+                                <i class="fa-solid fa-users"></i> تیم ما
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vitrine-card card-red" onclick="window.location.href='ads.html'">
+                    <div class="card-image">
+                        <i class="fa-solid fa-ad"></i>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">تبلیغات</div>
+                        <div class="card-meta">
+                            <span class="card-badge">تبلیغات</span>
+                            <span class="card-price">رزرو <span>تبلیغ</span></span>
+                        </div>
+                        <div class="card-footer-row">
+                            <span style="font-size:10px;color:#a08b73;">
+                                <i class="fa-solid fa-bullhorn"></i> محتوای تبلیغاتی
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="rules.html"><i class="fa-solid fa-gavel"></i> قوانین</a>
+            <a href="support.html"><i class="fa-solid fa-headset"></i> پشتیبانی</a>
+            <a href="about.html"><i class="fa-solid fa-circle-info"></i> درباره ما</a>
+        </div>
+        <p class="footer-text">
+            <i class="fa-solid fa-shield-halved"></i> گروه پناه — تمامی حقوق محفوظ است
+        </p>
+    </footer>
+
+    <a href="support.html" class="floating-support" title="پشتیبانی">
+        <i class="fa-solid fa-headset"></i>
+    </a>
+
+    <script>
+        // چک وضعیت لاگین
+        (function() {
+            var userData = localStorage.getItem('panah_user');
+            var profileBtn = document.getElementById('profileBtn');
+            var profileBtnText = document.getElementById('profileBtnText');
+            var logoutBtn = document.getElementById('logoutBtn');
+
+            if (userData) {
+                try {
+                    var user = JSON.parse(userData);
+                    if (user && user.token) {
+                        profileBtnText.textContent = user.displayName || user.username || 'پروفایل';
+                        profileBtn.href = 'profile.html';
+                        logoutBtn.style.display = 'flex';
+                    }
+                } catch(e) {
+                    localStorage.removeItem('panah_user');
+                    profileBtnText.textContent = 'حساب کاربری';
+                    profileBtn.href = 'login.html';
+                    logoutBtn.style.display = 'none';
+                }
+            } else {
+                profileBtnText.textContent = 'حساب کاربری';
+                profileBtn.href = 'login.html';
+                logoutBtn.style.display = 'none';
+            }
+        })();
+
+        function handleLogout() {
+            localStorage.removeItem('panah_user');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

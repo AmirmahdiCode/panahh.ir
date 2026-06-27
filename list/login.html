@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>گروه پناه | صفحه لوگین</title>
+    <title>گروه پناه | ورود و ثبت نام</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -156,8 +156,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzplWk-4_eWE2ygLwSrArNt
 checkExistingLogin();
 
 function checkExistingLogin() {
-    var userData = localStorage.getItem('panah_user');
-    if (userData) {
+    if (localStorage.getItem('panah_user')) {
         window.location.href = 'vitrine.html';
     }
 }
@@ -175,21 +174,41 @@ function switchTab(tab) {
     hideMessage();
 }
 
-function callAPI(action, data, callback) {
+function sendRequest(action, data, callback) {
     var jsonStr = JSON.stringify(data);
     var url = API_URL + '?action=' + action + '&data=' + encodeURIComponent(jsonStr);
     
-    var script = document.createElement('script');
-    var callbackName = 'cb_' + Date.now();
+    // روش img (همیشه کار میکنه)
+    var img = new Image();
+    var done = false;
     
-    window[callbackName] = function(response) {
-        delete window[callbackName];
-        document.body.removeChild(script);
-        callback(response);
+    img.onload = function() {
+        if (!done) {
+            done = true;
+            // باید یه درخواست دوم بزنیم که نتیجه رو بخونه
+            fetch(url + '&final=true')
+                .then(function(r) { return r.json(); })
+                .then(callback)
+                .catch(function() {
+                    callback({error: 'خطا در دریافت پاسخ'});
+                });
+        }
     };
     
-    script.src = url + '&callback=' + callbackName;
-    document.body.appendChild(script);
+    img.onerror = function() {
+        if (!done) {
+            done = true;
+            // با error هم ممکنه کار کرده باشه
+            fetch(url + '&final=true')
+                .then(function(r) { return r.json(); })
+                .then(callback)
+                .catch(function() {
+                    callback({error: 'خطا در ارتباط'});
+                });
+        }
+    };
+    
+    img.src = url;
 }
 
 function handleLogin() {
@@ -206,27 +225,17 @@ function handleLogin() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-    var jsonStr = JSON.stringify({username: username, password: password});
-    var url = API_URL + '?action=login&data=' + encodeURIComponent(jsonStr);
-
-    fetch(url)
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            if (data.success) {
-                saveToLocal(data.user, data.token);
-                showMessage('ورود موفقیت‌آمیز.', 'success');
-                setTimeout(function() { window.location.href = 'vitrine.html'; }, 500);
-            } else {
-                showMessage(data.error || 'خطا', 'error');
-                btn.disabled = false;
-                btn.innerHTML = 'ورود به گروه <i class="fa-solid fa-arrow-left-long"></i>';
-            }
-        })
-        .catch(function(e) {
-            showMessage('خطا در ارتباط.', 'error');
+    sendRequest('login', {username: username, password: password}, function(data) {
+        if (data && data.success) {
+            saveToLocal(data.user, data.token);
+            showMessage('ورود موفقیت‌آمیز.', 'success');
+            setTimeout(function() { window.location.href = 'vitrine.html'; }, 500);
+        } else {
+            showMessage((data && data.error) || 'خطا', 'error');
             btn.disabled = false;
             btn.innerHTML = 'ورود به گروه <i class="fa-solid fa-arrow-left-long"></i>';
-        });
+        }
+    });
 }
 
 function handleRegister() {
@@ -250,31 +259,21 @@ function handleRegister() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-    var jsonStr = JSON.stringify({username: username, displayName: displayName, password: password, avatar: 'fa-user'});
-    var url = API_URL + '?action=register&data=' + encodeURIComponent(jsonStr);
-
-    fetch(url)
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            if (data.success) {
-                showMessage('ثبت‌نام موفق. حالا وارد شوید.', 'success');
-                document.getElementById('loginUsername').value = username;
-                document.getElementById('regUsername').value = '';
-                document.getElementById('regDisplayName').value = '';
-                document.getElementById('regPassword').value = '';
-                document.getElementById('regPasswordConfirm').value = '';
-                setTimeout(function() { switchTab('login'); hideMessage(); }, 1500);
-            } else {
-                showMessage(data.error || 'خطا', 'error');
-            }
-            btn.disabled = false;
-            btn.innerHTML = 'ایجاد حساب <i class="fa-solid fa-check"></i>';
-        })
-        .catch(function(e) {
-            showMessage('خطا در ارتباط.', 'error');
-            btn.disabled = false;
-            btn.innerHTML = 'ایجاد حساب <i class="fa-solid fa-check"></i>';
-        });
+    sendRequest('register', {username: username, displayName: displayName, password: password, avatar: 'fa-user'}, function(data) {
+        if (data && data.success) {
+            showMessage('ثبت‌نام موفق. حالا وارد شوید.', 'success');
+            document.getElementById('loginUsername').value = username;
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regDisplayName').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regPasswordConfirm').value = '';
+            setTimeout(function() { switchTab('login'); hideMessage(); }, 1500);
+        } else {
+            showMessage((data && data.error) || 'خطا', 'error');
+        }
+        btn.disabled = false;
+        btn.innerHTML = 'ایجاد حساب <i class="fa-solid fa-check"></i>';
+    });
 }
 
 function saveToLocal(user, token) {
@@ -310,5 +309,3 @@ document.querySelectorAll('input').forEach(function(input) {
     });
 });
 </script>
-</body>
-</html>

@@ -363,207 +363,189 @@
         </div>
     </div>
 
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzV9pkE9RXWfpEDKiv4tkXugUqrWJJPfCnX-b2ll8s1fPM9FMaQqHKB9dHUxy87ofJWgA/exec';
+<script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzV9pkE9RXWfpEDKiv4tkXugUqrWJJPfCnX-b2ll8s1fPM9FMaQqHKB9dHUxy87ofJWgA/exec';
 
-        checkExistingLogin();
+    checkExistingLogin();
 
-        function checkExistingLogin() {
-            var userData = localStorage.getItem('panah_user');
-            if (userData) {
-                var user = JSON.parse(userData);
-                verifyToken(user.token).then(function(valid) {
-                    if (valid) {
-                        window.location.href = 'vitrine.html';
-                    } else {
-                        clearLocalUser();
-                    }
-                });
-            }
+    function checkExistingLogin() {
+        var userData = localStorage.getItem('panah_user');
+        if (userData) {
+            var user = JSON.parse(userData);
+            window.location.href = 'vitrine.html';
+        }
+    }
+
+    function switchTab(tab) {
+        var tabs = document.querySelectorAll('.tab-btn');
+        var panels = document.querySelectorAll('.form-panel');
+        
+        tabs.forEach(function(t) { t.classList.remove('active'); });
+        panels.forEach(function(p) { p.classList.remove('active'); });
+        
+        if (tab === 'login') {
+            tabs[0].classList.add('active');
+            document.getElementById('loginPanel').classList.add('active');
+        } else {
+            tabs[1].classList.add('active');
+            document.getElementById('registerPanel').classList.add('active');
+        }
+        
+        hideMessage();
+    }
+
+    async function handleLogin() {
+        var username = document.getElementById('loginUsername').value.trim();
+        var password = document.getElementById('loginPassword').value;
+
+        if (!username || !password) {
+            showMessage('لطفاً نام کاربری و رمز عبور را وارد کنید.', 'error');
+            return;
         }
 
-        async function verifyToken(token) {
-            try {
-                var url = API_URL + '?action=getUserInfo&data=' + encodeURIComponent(JSON.stringify({token: token}));
-                var res = await fetch(url);
-                var data = await res.json();
-                return !data.error;
-            } catch(e) {
-                return false;
-            }
-        }
+        showMessage('در حال اتصال...', 'success');
+        var btn = document.querySelector('#loginPanel .btn-submit');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ورود...';
 
-        function switchTab(tab) {
-            var tabs = document.querySelectorAll('.tab-btn');
-            var panels = document.querySelectorAll('.form-panel');
+        try {
+            var requestData = JSON.stringify({username: username, password: password});
+            var url = API_URL + '?action=login&data=' + encodeURIComponent(requestData);
             
-            tabs.forEach(function(t) { t.classList.remove('active'); });
-            panels.forEach(function(p) { p.classList.remove('active'); });
+            var res = await fetch(url);
+            var text = await res.text();
             
-            if (tab === 'login') {
-                tabs[0].classList.add('active');
-                document.getElementById('loginPanel').classList.add('active');
+            console.log('Response:', text);
+            
+            var data = JSON.parse(text);
+
+            if (data.success) {
+                saveToLocal(data.user, data.token);
+                showMessage('ورود موفقیت‌آمیز. در حال انتقال...', 'success');
+                setTimeout(function() {
+                    window.location.href = 'vitrine.html';
+                }, 800);
             } else {
-                tabs[1].classList.add('active');
-                document.getElementById('registerPanel').classList.add('active');
-            }
-            
-            hideMessage();
-        }
-
-        async function handleLogin() {
-            var username = document.getElementById('loginUsername').value.trim();
-            var password = document.getElementById('loginPassword').value;
-
-            if (!username || !password) {
-                showMessage('لطفاً نام کاربری و رمز عبور را وارد کنید.', 'error');
-                return;
-            }
-
-            showMessage('در حال اتصال...', 'success');
-            var btn = document.querySelector('#loginPanel .btn-submit');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ورود...';
-
-            try {
-                var url = API_URL + '?action=login&data=' + encodeURIComponent(JSON.stringify({
-                    username: username,
-                    password: password
-                }));
-                
-                var res = await fetch(url);
-                var data = await res.json();
-
-                if (data.success) {
-                    saveToLocal(data.user, data.token);
-                    showMessage('ورود موفقیت‌آمیز. در حال انتقال...', 'success');
-                    setTimeout(function() {
-                        window.location.href = 'vitrine.html';
-                    }, 800);
-                } else {
-                    showMessage(data.error || 'نام کاربری یا رمز عبور اشتباه است.', 'error');
-                    btn.disabled = false;
-                    btn.innerHTML = 'ورود به گروه <i class="fa-solid fa-arrow-left-long"></i>';
-                }
-            } catch(e) {
-                showMessage('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.', 'error');
+                showMessage(data.error || 'نام کاربری یا رمز عبور اشتباه است.', 'error');
                 btn.disabled = false;
                 btn.innerHTML = 'ورود به گروه <i class="fa-solid fa-arrow-left-long"></i>';
             }
-        }
-
-        async function handleRegister() {
-            var username = document.getElementById('regUsername').value.trim();
-            var displayName = document.getElementById('regDisplayName').value.trim();
-            var password = document.getElementById('regPassword').value;
-            var passwordConfirm = document.getElementById('regPasswordConfirm').value;
-
-            if (!username || !displayName || !password) {
-                showMessage('لطفاً تمام فیلدها را پر کنید.', 'error');
-                return;
-            }
-
-            if (password.length < 4) {
-                showMessage('رمز عبور باید حداقل ۴ کاراکتر باشد.', 'error');
-                return;
-            }
-
-            if (password !== passwordConfirm) {
-                showMessage('رمز عبور و تکرار آن مطابقت ندارند.', 'error');
-                return;
-            }
-
-            if (username.length < 3) {
-                showMessage('نام کاربری باید حداقل ۳ کاراکتر باشد.', 'error');
-                return;
-            }
-
-            showMessage('در حال ثبت‌نام...', 'success');
-            var btn = document.querySelector('#registerPanel .btn-submit');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ثبت‌نام...';
-
-            try {
-                var url = API_URL + '?action=register&data=' + encodeURIComponent(JSON.stringify({
-                    username: username,
-                    displayName: displayName,
-                    password: password,
-                    avatar: 'fa-user'
-                }));
-                
-                var res = await fetch(url);
-                var data = await res.json();
-
-                if (data.success) {
-                    showMessage('ثبت‌نام با موفقیت انجام شد. اکنون وارد شوید.', 'success');
-                    document.getElementById('loginUsername').value = username;
-                    document.getElementById('loginPassword').value = '';
-                    document.getElementById('regUsername').value = '';
-                    document.getElementById('regDisplayName').value = '';
-                    document.getElementById('regPassword').value = '';
-                    document.getElementById('regPasswordConfirm').value = '';
-                    
-                    setTimeout(function() {
-                        switchTab('login');
-                        hideMessage();
-                    }, 1500);
-                } else {
-                    showMessage(data.error || 'خطا در ثبت‌نام. نام کاربری تکراری است.', 'error');
-                }
-            } catch(e) {
-                showMessage('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.', 'error');
-            }
-
+        } catch(e) {
+            showMessage('خطا: ' + e.message, 'error');
             btn.disabled = false;
-            btn.innerHTML = 'ایجاد حساب <i class="fa-solid fa-check"></i>';
+            btn.innerHTML = 'ورود به گروه <i class="fa-solid fa-arrow-left-long"></i>';
+        }
+    }
+
+    async function handleRegister() {
+        var username = document.getElementById('regUsername').value.trim();
+        var displayName = document.getElementById('regDisplayName').value.trim();
+        var password = document.getElementById('regPassword').value;
+        var passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+        if (!username || !displayName || !password) {
+            showMessage('لطفاً تمام فیلدها را پر کنید.', 'error');
+            return;
         }
 
-        function saveToLocal(user, token) {
-            clearLocalUser();
-            
-            var userData = {
-                id: user.id,
-                username: user.username,
-                displayName: user.displayName,
-                avatar: user.avatar,
-                bio: user.bio || '',
-                userType: user.userType,
-                token: token,
-                loginTime: Date.now()
-            };
-            
-            localStorage.setItem('panah_user', JSON.stringify(userData));
+        if (password.length < 4) {
+            showMessage('رمز عبور باید حداقل ۴ کاراکتر باشد.', 'error');
+            return;
         }
 
-        function clearLocalUser() {
-            localStorage.removeItem('panah_user');
+        if (password !== passwordConfirm) {
+            showMessage('رمز عبور و تکرار آن مطابقت ندارند.', 'error');
+            return;
         }
 
-        function showMessage(text, type) {
-            var box = document.getElementById('messageBox');
-            box.textContent = text;
-            box.className = 'message-box ' + type;
-            box.style.display = 'block';
+        if (username.length < 3) {
+            showMessage('نام کاربری باید حداقل ۳ کاراکتر باشد.', 'error');
+            return;
         }
 
-        function hideMessage() {
-            var box = document.getElementById('messageBox');
-            box.style.display = 'none';
-            box.className = 'message-box';
-        }
+        showMessage('در حال ثبت‌نام...', 'success');
+        var btn = document.querySelector('#registerPanel .btn-submit');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ثبت‌نام...';
 
-        document.querySelectorAll('input').forEach(function(input) {
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    if (document.getElementById('loginPanel').classList.contains('active')) {
-                        handleLogin();
-                    } else {
-                        handleRegister();
-                    }
-                }
+        try {
+            var requestData = JSON.stringify({
+                username: username,
+                displayName: displayName,
+                password: password,
+                avatar: 'fa-user'
             });
-        });
-    </script>
+            
+            var url = API_URL + '?action=register&data=' + encodeURIComponent(requestData);
+            var res = await fetch(url);
+            var data = await res.json();
 
-</body>
-</html>
+            if (data.success) {
+                showMessage('ثبت‌نام با موفقیت انجام شد. اکنون وارد شوید.', 'success');
+                document.getElementById('loginUsername').value = username;
+                document.getElementById('regUsername').value = '';
+                document.getElementById('regDisplayName').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regPasswordConfirm').value = '';
+                
+                setTimeout(function() {
+                    switchTab('login');
+                    hideMessage();
+                }, 1500);
+            } else {
+                showMessage(data.error || 'خطا در ثبت‌نام.', 'error');
+            }
+        } catch(e) {
+            showMessage('خطا: ' + e.message, 'error');
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = 'ایجاد حساب <i class="fa-solid fa-check"></i>';
+    }
+
+    function saveToLocal(user, token) {
+        clearLocalUser();
+        
+        var userData = {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatar: user.avatar,
+            bio: user.bio || '',
+            userType: user.userType,
+            token: token,
+            loginTime: Date.now()
+        };
+        
+        localStorage.setItem('panah_user', JSON.stringify(userData));
+    }
+
+    function clearLocalUser() {
+        localStorage.removeItem('panah_user');
+    }
+
+    function showMessage(text, type) {
+        var box = document.getElementById('messageBox');
+        box.textContent = text;
+        box.className = 'message-box ' + type;
+        box.style.display = 'block';
+    }
+
+    function hideMessage() {
+        var box = document.getElementById('messageBox');
+        box.style.display = 'none';
+        box.className = 'message-box';
+    }
+
+    document.querySelectorAll('input').forEach(function(input) {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (document.getElementById('loginPanel').classList.contains('active')) {
+                    handleLogin();
+                } else {
+                    handleRegister();
+                }
+            }
+        });
+    });
+</script>

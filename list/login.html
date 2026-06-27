@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>گروه پناه | ورود و ثبت نام</title>
+    <title>گروه پناه | ورود و ثبت‌نام</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -82,7 +82,7 @@
             align-items: center; justify-content: center; gap: 8px; margin-top: 4px;
         }
         .btn-submit:hover { background: #4a3520; transform: translateY(-1px); }
-        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
         .message-box {
             padding: 12px 16px; border-radius: 10px; font-size: 12px;
             font-weight: 500; text-align: center; display: none;
@@ -128,7 +128,7 @@
             <div class="input-group">
                 <input type="password" id="loginPassword" placeholder="رمز عبور"><i class="fa-solid fa-lock"></i>
             </div>
-            <button class="btn-submit" onclick="handleLogin()">ورود به گروه <i class="fa-solid fa-arrow-left-long"></i></button>
+            <button class="btn-submit" id="loginBtn" onclick="handleLogin()">ورود به گروه <i class="fa-solid fa-arrow-left-long"></i></button>
         </div>
         <div class="form-panel" id="registerPanel">
             <div class="input-group">
@@ -143,25 +143,34 @@
             <div class="input-group">
                 <input type="password" id="regPasswordConfirm" placeholder="تکرار رمز عبور"><i class="fa-solid fa-lock"></i>
             </div>
-            <button class="btn-submit" onclick="handleRegister()">ایجاد حساب <i class="fa-solid fa-check"></i></button>
+            <button class="btn-submit" id="regBtn" onclick="handleRegister()">ایجاد حساب <i class="fa-solid fa-check"></i></button>
         </div>
-        <a href="index.html" class="back-link"><i class="fa-solid fa-chevron-right"></i> بازگشت به صفحه اصلی</a>
+        <a href="../index.html" class="back-link"><i class="fa-solid fa-chevron-right"></i> بازگشت به صفحه اصلی</a>
     </div>
     <div class="auth-footer">گروه پناه — تمامی حقوق محفوظ است</div>
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbz-2ZA6hYsfGaqk0ZGCUm8VRACUcElgWC-gE_uxcGSFrnq8flP1juod1_0KF7C6qbYTQQ/exec';
+var API_URL = 'https://script.google.com/macros/s/AKfycbz-2ZA6hYsfGaqk0ZGCUm8VRACUcElgWC-gE_uxcGSFrnq8flP1juod1_0KF7C6qbYTQQ/exec';
+var isSubmitting = false;
 
-checkExistingLogin();
-
-function checkExistingLogin() {
-    if (localStorage.getItem('panah_user')) {
-        window.location.href = 'vitrine.html';
+(function() {
+    var saved = localStorage.getItem('panah_user');
+    if (saved) {
+        try {
+            var user = JSON.parse(saved);
+            if (user && user.token) {
+                window.location.href = 'vitrine.html';
+            }
+        } catch(e) {
+            localStorage.removeItem('panah_user');
+        }
     }
-}
+})();
 
 function switchTab(tab) {
+    if (isSubmitting) return;
+    
     document.querySelectorAll('.tab-btn').forEach(function(t) { t.classList.remove('active'); });
     document.querySelectorAll('.form-panel').forEach(function(p) { p.classList.remove('active'); });
     if (tab === 'login') {
@@ -174,44 +183,9 @@ function switchTab(tab) {
     hideMessage();
 }
 
-function sendRequest(action, data, callback) {
-    var jsonStr = JSON.stringify(data);
-    var url = API_URL + '?action=' + action + '&data=' + encodeURIComponent(jsonStr);
-    
-    // روش img (همیشه کار میکنه)
-    var img = new Image();
-    var done = false;
-    
-    img.onload = function() {
-        if (!done) {
-            done = true;
-            // باید یه درخواست دوم بزنیم که نتیجه رو بخونه
-            fetch(url + '&final=true')
-                .then(function(r) { return r.json(); })
-                .then(callback)
-                .catch(function() {
-                    callback({error: 'خطا در دریافت پاسخ'});
-                });
-        }
-    };
-    
-    img.onerror = function() {
-        if (!done) {
-            done = true;
-            // با error هم ممکنه کار کرده باشه
-            fetch(url + '&final=true')
-                .then(function(r) { return r.json(); })
-                .then(callback)
-                .catch(function() {
-                    callback({error: 'خطا در ارتباط'});
-                });
-        }
-    };
-    
-    img.src = url;
-}
-
 function handleLogin() {
+    if (isSubmitting) return;
+    
     var username = document.getElementById('loginUsername').value.trim();
     var password = document.getElementById('loginPassword').value;
 
@@ -220,25 +194,46 @@ function handleLogin() {
         return;
     }
 
+    isSubmitting = true;
     showMessage('در حال اتصال...', 'success');
-    var btn = document.querySelector('#loginPanel .btn-submit');
+    var btn = document.getElementById('loginBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ورود...';
 
-    sendRequest('login', {username: username, password: password}, function(data) {
-        if (data && data.success) {
+    fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'login',
+            username: username,
+            password: password
+        })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
             saveToLocal(data.user, data.token);
             showMessage('ورود موفقیت‌آمیز.', 'success');
-            setTimeout(function() { window.location.href = 'vitrine.html'; }, 500);
+            setTimeout(function() {
+                window.location.href = 'vitrine.html';
+            }, 500);
         } else {
-            showMessage((data && data.error) || 'خطا', 'error');
+            showMessage(data.error || 'نام کاربری یا رمز عبور اشتباه است.', 'error');
+            isSubmitting = false;
             btn.disabled = false;
             btn.innerHTML = 'ورود به گروه <i class="fa-solid fa-arrow-left-long"></i>';
         }
+    })
+    .catch(function() {
+        showMessage('خطا در ارتباط با سرور.', 'error');
+        isSubmitting = false;
+        btn.disabled = false;
+        btn.innerHTML = 'ورود به گروه <i class="fa-solid fa-arrow-left-long"></i>';
     });
 }
 
 function handleRegister() {
+    if (isSubmitting) return;
+    
     var username = document.getElementById('regUsername').value.trim();
     var displayName = document.getElementById('regDisplayName').value.trim();
     var password = document.getElementById('regPassword').value;
@@ -253,39 +248,68 @@ function handleRegister() {
     if (password !== passwordConfirm) {
         showMessage('رمز عبور و تکرار آن مطابقت ندارند.', 'error'); return;
     }
+    if (username.length < 3) {
+        showMessage('نام کاربری باید حداقل ۳ کاراکتر باشد.', 'error'); return;
+    }
 
+    isSubmitting = true;
     showMessage('در حال ثبت‌نام...', 'success');
-    var btn = document.querySelector('#registerPanel .btn-submit');
+    var btn = document.getElementById('regBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال ثبت‌نام...';
 
-    sendRequest('register', {username: username, displayName: displayName, password: password, avatar: 'fa-user'}, function(data) {
-        if (data && data.success) {
-            showMessage('ثبت‌نام موفق. حالا وارد شوید.', 'success');
+    fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'register',
+            username: username,
+            displayName: displayName,
+            password: password,
+            avatar: 'fa-user'
+        })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showMessage('ثبت‌نام با موفقیت انجام شد.', 'success');
             document.getElementById('loginUsername').value = username;
             document.getElementById('regUsername').value = '';
             document.getElementById('regDisplayName').value = '';
             document.getElementById('regPassword').value = '';
             document.getElementById('regPasswordConfirm').value = '';
-            setTimeout(function() { switchTab('login'); hideMessage(); }, 1500);
+            setTimeout(function() {
+                switchTab('login');
+                hideMessage();
+                isSubmitting = false;
+            }, 1500);
         } else {
-            showMessage((data && data.error) || 'خطا', 'error');
+            showMessage(data.error || 'خطا در ثبت‌نام.', 'error');
+            isSubmitting = false;
         }
+        btn.disabled = false;
+        btn.innerHTML = 'ایجاد حساب <i class="fa-solid fa-check"></i>';
+    })
+    .catch(function() {
+        showMessage('خطا در ارتباط با سرور.', 'error');
+        isSubmitting = false;
         btn.disabled = false;
         btn.innerHTML = 'ایجاد حساب <i class="fa-solid fa-check"></i>';
     });
 }
 
 function saveToLocal(user, token) {
-    clearLocalUser();
+    localStorage.removeItem('panah_user');
     localStorage.setItem('panah_user', JSON.stringify({
-        id: user.id, username: user.username, displayName: user.displayName,
-        avatar: user.avatar, bio: user.bio || '', userType: user.userType,
-        token: token, loginTime: Date.now()
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        avatar: user.avatar,
+        bio: user.bio || '',
+        userType: user.userType,
+        token: token,
+        loginTime: Date.now()
     }));
 }
-
-function clearLocalUser() { localStorage.removeItem('panah_user'); }
 
 function showMessage(text, type) {
     var box = document.getElementById('messageBox');
@@ -302,10 +326,15 @@ function hideMessage() {
 
 document.querySelectorAll('input').forEach(function(input) {
     input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            if (document.getElementById('loginPanel').classList.contains('active')) handleLogin();
-            else handleRegister();
+        if (e.key === 'Enter' && !isSubmitting) {
+            if (document.getElementById('loginPanel').classList.contains('active')) {
+                handleLogin();
+            } else {
+                handleRegister();
+            }
         }
     });
 });
 </script>
+</body>
+</html>

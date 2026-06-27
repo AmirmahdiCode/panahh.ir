@@ -1,1 +1,0 @@
-# panahh.ir

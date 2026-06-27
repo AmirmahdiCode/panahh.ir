@@ -21,21 +21,17 @@
             --orange: #e67e22;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--white);
+            background: linear-gradient(135deg, var(--cream) 0%, var(--milk) 50%, var(--beige) 100%);
             color: var(--text);
             min-height: 100vh;
         }
 
         .header {
-            background: var(--milk);
+            background: var(--white);
             box-shadow: 0 2px 16px rgba(0,0,0,0.04);
             padding: 16px 20px;
             position: sticky;
@@ -61,15 +57,16 @@
         .header-icon {
             width: 44px;
             height: 44px;
-            background: linear-gradient(145deg, var(--white), var(--beige));
             border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--milk);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            background: linear-gradient(145deg, var(--milk), var(--beige));
             color: var(--brown);
-            border: 2px solid var(--gold);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            font-size: 22px;
         }
 
         .header-title {
@@ -105,7 +102,7 @@
         }
 
         .btn-profile:hover {
-            background: var(--white);
+            background: var(--milk);
         }
 
         .btn-logout {
@@ -154,7 +151,7 @@
 
         .vitrine-card {
             background: var(--white);
-            border-radius: 14px;
+            border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 3px 14px rgba(0,0,0,0.04);
             transition: all 0.3s ease;
@@ -221,9 +218,9 @@
         .card-badge {
             font-size: 10px;
             color: var(--white);
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 16px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .card-price {
@@ -241,8 +238,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
-            padding-top: 10px;
+            margin-top: 8px;
+            padding-top: 8px;
             border-top: 1px solid #f5efe6;
         }
 
@@ -279,9 +276,40 @@
         .footer {
             text-align: center;
             padding: 24px 20px;
-            background: var(--milk);
+            background: var(--white);
             margin-top: 20px;
-            border-top: 1px solid #e8ddd0;
+            border-top: 1px solid #f0e8dc;
+        }
+
+        .footer-stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .footer-stat i {
+            font-size: 18px;
+            color: var(--brown);
+        }
+
+        .footer-stat span {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .footer-stat small {
+            font-size: 10px;
+            color: #a08b73;
         }
 
         .footer-links {
@@ -426,13 +454,8 @@
             </div>
 
             <div class="card-row-4">
-                <!-- کارت ۱ - حمایت از سازنده -->
                 <div class="vitrine-card card-gold" onclick="window.open('https://eitaa.com/Amirmahdi_code','_blank')">
-                    <img src="https://cdn.imgurl.ir/uploads/m87412_4b5310ee-fa5a-4d2e-a58c-a9337ddb4f92.png" 
-                         class="card-image" 
-                         alt="حمایت از سازنده"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                         style="object-fit:cover;">
+                    <img src="https://cdn.imgurl.ir/uploads/m87412_4b5310ee-fa5a-4d2e-a58c-a9337ddb4f92.png" class="card-image" alt="حمایت از سازنده" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" style="object-fit:cover;">
                     <div class="card-image" style="display:none;">
                         <i class="fa-solid fa-heart"></i>
                     </div>
@@ -450,7 +473,6 @@
                     </div>
                 </div>
 
-                <!-- کارت ۲ - تبلیغات -->
                 <div class="vitrine-card card-red" onclick="window.location.href='ads.html'">
                     <div class="card-image">
                         <i class="fa-solid fa-ad"></i>
@@ -469,7 +491,6 @@
                     </div>
                 </div>
 
-                <!-- کارت ۳ - قوانین -->
                 <div class="vitrine-card card-orange" onclick="window.location.href='rules.html'">
                     <div class="card-image">
                         <i class="fa-solid fa-gavel"></i>
@@ -488,7 +509,6 @@
                     </div>
                 </div>
 
-                <!-- کارت ۴ - درباره ما -->
                 <div class="vitrine-card card-green" onclick="window.location.href='about.html'">
                     <div class="card-image">
                         <i class="fa-solid fa-circle-info"></i>
@@ -518,7 +538,7 @@
             <a href="about.html"><i class="fa-solid fa-circle-info"></i> درباره ما</a>
         </div>
         <p class="footer-text">
-            <i class="fa-solid fa-shield-halved"></i> گروه پناه — تمامی حقوق محفوظ است
+            <i class="fa-solid fa-shield-halved"></i> گروه پناه — کلیه حقوق محفوظ است
         </p>
     </footer>
 
